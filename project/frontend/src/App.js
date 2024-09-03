@@ -23,8 +23,8 @@ function App() {
             <Route path='/login' element={<LogIn />} />
             <Route path='/register' element={<Register />} />
             <Route path='/subrecipe' element={<SubRec />} />
-            <Route path='/recdetail' element={<RecDet />} />
-  
+            <Route path='/recdetail/:id' element={<RecDet />} />
+            
           </Routes>
   
           <Footer />
