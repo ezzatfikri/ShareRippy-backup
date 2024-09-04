@@ -11,14 +11,13 @@ function SubRec() {
   const [difficulty, setDifficulty] = useState('');
   const [category, setCategory] = useState('');
   const [image, setImage] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
-  const [showModal, setShowModal] = useState(false); // State to control the modal visibility
 
-  function handleSubmit(e) {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-     // Check if all required fields are filled
-     if (
+    if (
       !recipeName ||
       !description ||
       !ingredients ||
@@ -31,6 +30,7 @@ function SubRec() {
       return;
     }
 
+    // Prepare data to send to your server
     const formData = new FormData();
     formData.append('recipeName', recipeName);
     formData.append('description', description);
@@ -38,16 +38,15 @@ function SubRec() {
     formData.append('cookingSteps', cookingSteps);
     formData.append('difficulty', difficulty);
     formData.append('category', category);
-    if (image) {
-      formData.append('image', image);
-    }
+    formData.append('image', image);
 
-    axios.post("http://localhost:5000/subrecipe", formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    })
-    .then(res => { 
+    try {
+      const res = await axios.post("http://localhost:5000/subrecipe", formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
       console.log(res);
       setShowModal(true);  // Show the custom pop-up modal on success
 
@@ -59,11 +58,10 @@ function SubRec() {
       setDifficulty('');
       setCategory('');
       setImage(null);
-    })
-    .catch(err => {
-      console.error(err);
+    } catch (err) {
+      console.error('Error submitting recipe:', err);
       // Handle the error accordingly
-    });
+    }
   }
 
   function handleCloseModal() {
@@ -75,7 +73,6 @@ function SubRec() {
     <div className="subrec-container">
       <h1 className="subrec-title">Submit Recipe</h1>
       <form onSubmit={handleSubmit} className="subrec-form">
-        {/* Form fields for recipe submission */}
         <div className="subrec-form-group">
           <label htmlFor="recipeName" className="subrec-label">Recipe Name:</label>
           <input type="text" id="recipeName" className="subrec-input" value={recipeName} onChange={(e) => setRecipeName(e.target.value)} />
@@ -85,19 +82,18 @@ function SubRec() {
           <textarea id="description" className="subrec-textarea" value={description} onChange={(e) => setDescription(e.target.value)} />
         </div>
         <div className="subrec-form-group">
-          <label htmlFor="ingredients" className="subrec-label">Ingredients:</label>
+          <label htmlFor="ingredients" className="subrec-label">Ingredients: (put ',' at the end of each ingredient)</label>
           <textarea id="ingredients" className="subrec-textarea" value={ingredients} onChange={(e) => setIngredients(e.target.value)} />
         </div>
         <div className="subrec-form-group">
-          <label htmlFor="cookingSteps" className="subrec-label">Cooking Steps:</label>
+          <label htmlFor="cookingSteps" className="subrec-label">Cooking Steps: (put '.' at the end of each step)</label>
           <textarea id="cookingSteps" className="subrec-textarea" value={cookingSteps} onChange={(e) => setCookingSteps(e.target.value)} />
         </div>
         <div className="subrec-form-group">
           <label htmlFor="image" className="subrec-label">Upload Image:</label>
           <input type="file" id="image" className="subrec-input" onChange={(e) => setImage(e.target.files[0])} />
         </div>
-        
-        {/* Radio buttons for difficulty level */}
+
         <div className="subrec-form-group">
           <label htmlFor="difficulty" className="subrec-label">Level of Difficulty:</label>
           <div className="subrec-radio-group">
@@ -114,7 +110,6 @@ function SubRec() {
           </div>
         </div>
 
-        {/* Radio buttons for category */}
         <div className="subrec-form-group">
           <label className="subrec-label">Category:</label>
           <div className="subrec-radio-group">
@@ -135,11 +130,9 @@ function SubRec() {
           </div>
         </div>
 
-        {/* Submit button */}
         <button type="submit" className="subrec-button">Submit Recipe</button>
       </form>
 
-      {/* Modal for success message */}
       {showModal && (
         <div className="modal-overlay">
           <div className="modal-content">

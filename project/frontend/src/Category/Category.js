@@ -16,7 +16,7 @@ function Category() {
         })
         .catch((error) => console.error('Error fetching recipes:', error));
     };
-  
+
     fetchRecipes();
   }, []);
 
@@ -28,7 +28,7 @@ function Category() {
     const filteredRecipes = recipes.filter(
       (recipe) => recipe.category === selectedCategory
     );
-
+  
     if (filteredRecipes.length === 0) {
       return (
         <div>
@@ -36,19 +36,23 @@ function Category() {
         </div>
       );
     }
-
+  
     return (
       <div className="row">
         {filteredRecipes.map((recipe) => (
           <div key={recipe.id} className="col-md-4">
             <div className="card">
               <img
-                src={`data:image/jpeg;base64,${recipe.image}`}
+                src={recipe.imageUrl} // Use the Cloudinary image URL
                 className="card-img-top"
-                alt={recipe.recipe_name}
+                alt={recipe.recipeName}
+                onError={(e) => {
+                  console.error("Image failed to load:", recipe.imageUrl);
+                  e.target.src = "path/to/placeholder-image.jpg"; // Fallback image if load fails
+                }}
               />
               <div className="card-body">
-                <h5 className="card-title">{recipe.recipe_name}</h5>
+                <h5 className="card-title">{recipe.recipeName}</h5>
                 <p className="card-text">{recipe.description}</p>
                 <a href={`/recdetail/${recipe.id}`} className="btn btn-primary">View Recipe</a>
               </div>
@@ -58,6 +62,7 @@ function Category() {
       </div>
     );
   };
+  
 
   return (
     <div className="category-container">
@@ -70,8 +75,8 @@ function Category() {
       </nav>
       <div className="category-content">
         {selectedCategory === 'default' ? (
-          <div className="card" style={{textAlign: 'center'}}>
-            <div className="card-body" >
+          <div className="card" style={{ textAlign: 'center' }}>
+            <div className="card-body">
               <h1 className="card-title">Category</h1>
               <p className="card-text">Select a category from the sidebar to explore.</p>
             </div>
